@@ -1,7 +1,7 @@
 <div align="center">
 	<h1> pipex </h1>
 	<p> Este proyecto te permitirá descubrir, mediante el uso en tu programa, el funcionamiento de un mecanismo de UNIX que ya conoces.</p>
-	<img src="WAKATIME BADGE?style=flat"/>
+	<img src="https://wakatime.com/badge/user/a0e860d2-9914-4fed-8143-b9fd5cf5e6c1/project/d29be413-913b-493f-b5e4-ac27d08d4446.svg?style=flat"/>
 	<br />
 	<img src="https://img.shields.io/badge/norme-KO-red?style=flat"/>
 	<img src="https://img.shields.io/badge/leaks-KO-red?style=flat"/>
