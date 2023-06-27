@@ -4,7 +4,7 @@ RM = rm -f
 
 NAME = pipex
 SRC_DIR = src/
-SRC = main.c
+SRC = pipex.c
 OBJ_DIR = objs/
 OBJ = $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
@@ -23,6 +23,7 @@ libft:
 clean:
 	@$(RM) $(OBJ) $(BONUS_OBJ)
 	@make -C libft/ clean
+	@ echo " ...	clean finished	..."
 
 fclean: clean
 	@$(RM) $(NAME) $(BONUS_NAME)

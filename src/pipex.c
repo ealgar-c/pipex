@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ealgar-c <ealgar-c@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 15:34:06 by ealgar-c          #+#    #+#             */
-/*   Updated: 2023/06/27 14:01:49 by ealgar-c         ###   ########.fr       */
+/*   Updated: 2023/06/27 15:57:08 by ealgar-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,22 @@ char	*get_useful_path(char *cmd, char **envp)
 	char	**all_paths;
 
 	i = 0;
-	while (ft_strncmp(envp[i], "PATH=", 5) == 0)
+	while (ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
 	all_paths = ft_split(envp[i] + 5, ':');
 	i = 0;
 	while (all_paths[i])
 	{
 		path = ft_strjoin(ft_strjoin(all_paths[i], "/"), cmd);
-		if (access(path, F_OK))
+		if (access(path, X_OK) == 0)
 			return (path);
+		free(path);
 		i++;
 	}
-	//liberar memoria
+	i = 0;
+	while (all_paths[i])
+		free(all_paths[i++]);
+	free(all_paths);
 	return (NULL);
 }
 
@@ -38,13 +42,17 @@ void	execute_process(char *cmd, char **envp)
 {
 	char	*path;
 	char	**cmd_splitted;
+	int		i;
 
+	i = 0;
 	cmd_splitted = ft_split(cmd, ' ');
 	path = get_useful_path(cmd_splitted[0], envp);
 	if (path == NULL)
 	{
-		ft_printf("Error en el cmd1\n");
-		//liberar memoria
+		ft_printf("Error: Command %s not found\n", cmd_splitted[0]);
+		while (cmd_splitted[i])
+			free(cmd_splitted[i++]);
+		free(cmd_splitted);
 		exit(EXIT_FAILURE);
 	}
 	execve(path, cmd_splitted, envp);
