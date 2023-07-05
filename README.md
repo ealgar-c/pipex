@@ -3,7 +3,7 @@
 	<p> Este proyecto te permitirá descubrir, mediante el uso en tu programa, el funcionamiento de un mecanismo de UNIX que ya conoces.</p>
 	<img src="https://wakatime.com/badge/user/a0e860d2-9914-4fed-8143-b9fd5cf5e6c1/project/d29be413-913b-493f-b5e4-ac27d08d4446.svg?style=flat"/>
 	<br />
-	<img src="https://img.shields.io/badge/norme-KO-red?style=flat"/>
+	<img src="https://img.shields.io/badge/norme-OK-success?style=flat"/>
 	<img src="https://img.shields.io/badge/leaks-KO-red?style=flat"/>
 	<img src="https://img.shields.io/badge/bonus-not%20done-red?style=flat"/>
 	<img src="https://img.shields.io/badge/-unknown%2F100-inactive?style=flat&logo=42&logoColor=000" />
@@ -21,7 +21,12 @@ Este proyecto busca profundizar un poco en dos conceptos que ya conoces: Las red
 ├── README.md
 ├── libft/
 ├── include/
+│   └── pipex.h
+├── infile
+├── objs/
+├── outfile
 └── src/
+    └── pipex.c
 
 ```
 
@@ -35,7 +40,32 @@ Este proyecto busca profundizar un poco en dos conceptos que ya conoces: Las red
 
 <h2 align="center">⚙️ PROYECT GENERAL PROCEDURE ⚙️</h2>
 
+## FUNCIONES AUTORIZADAS:
 
+| FUNCIONES | LIBRERÍA | descripcion | estructura |
+| --- | --- | --- | --- |
+| open | <fcntl.h> | abre un archivo y devuelve su fd | int    open(char *path, int mode) |
+| close | <unistd.h> | cierra un fd | int close(int fd) |
+| read | <unistd.h> | lee un trozo del fd | ssize_t read(int fd, void buf[.count], size_t count) |
+| write | <unistd.h> | escribe por pantalla | ssize_t read(int fd, void buf[.count], size_t count) |
+| malloc | <stdlib.h> | aloja memoria para una variable | void *malloc(size_t size) |
+| free | <stdlib.h> | libera memoria alojada | void free(void *ptr) |
+| perror | <stdio.h> <errno.h> | printea por pantalla el ultimo error encontrado | void perror(const char *s) |
+| strerror | <string.h> | devuelve un string que describe el error encontrado | char *strerror(int errnum) |
+| access | <unistd.h> | Comprueba si tiene acceso a una dirección | int access(const char *pathname, int mode) |
+| dup | <unistd.h> | Se aloja un nuevo fd a un fd antiguo | int dup(int oldfd) |
+| dup2 | <unistd.h> | igual que dup pero indicando el nuevo fd | int dup2(int newfd, int oldfd) |
+| execve | <unistd.h> | ejecuta el programa encontrado en el path | int execve(const char *pathname, char *const _Nullable argv[],char *const _Nullable envp[]) |
+| exit | <stdlib.h> | Cierra el programa | void exit(int status) |
+| fork | <unistd.h> | Crea un subproceso llamado proceso hijo | pid_t fork(void) |
+| pipe | <unistd.h> | Crea un canal de comunicación entre subprocesos | int pipe(int pipefd[2]) |
+| unlink | <unistd.h> | Elimina un nombre del archivo del sistema | int unlink(const char *pathname) |
+| wait | <sys/wait.h> | espera a que termine el proceso hijo | pid_t wait(int *_Nullable wstatus) |
+| waitpid | <sys/wait.h> | En caso de tener varios hijos, indica a cual esperar | pid_t waitpid(pid_t pid, int *_Nullable wstatus, int options) |
+
+## EXPLICACIÓN DE LAS FUNCIONES MÁS IMPORTANTES PARA EL PROYECTO:
+
+### FUNCIONAMIENTO DE PIPE():
 ```bash
 // cada cmd necesista un stdin (entrada) y devuelve una salida (a stdout)
    
@@ -60,10 +90,9 @@ Cuando se llama a la función **`fork()`**, el sistema operativo crea un nuevo p
 
 Los valores que devuelve fork son:
 
-- < 0 si la función ha fallado
-
+- -1 si la función ha fallado
 - 0 si estamos en el proceso hijo
-- > 0 si estamos en el proceso padre
+- más de 0 si estamos en el proceso padre
 
 Al hacer un fork y crear un nuevo proceso, el orden de ejecución del padre y el hijo es cosa nuestra.
 
