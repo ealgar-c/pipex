@@ -30,7 +30,7 @@ Este proyecto busca profundizar un poco en dos conceptos que ya conoces: Las red
 
 ```
 
-<h2 align="center">🚶🏻‍♂️ PROYECT ROADMAP 🚶</h2>
+<h2 align="center">🚶 PROYECT ROADMAP 🚶</h2>
 
 <h3 align="center"> 🧠 BRAINSTORM PREVIO </h3>
 
