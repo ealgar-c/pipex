@@ -34,3 +34,205 @@ Este proyecto busca profundizar un poco en dos conceptos que ya conoces: Las red
 *  Manuales de las funciones permitidas
 
 <h2 align="center">⚙️ PROYECT GENERAL PROCEDURE ⚙️</h2>
+
+
+```bash
+// cada cmd necesista un stdin (entrada) y devuelve una salida (a stdout)
+   
+    🗄infile                                             🗄outfile
+  stdin de cmd1                                       stdout de cmd2            
+       |                        PIPE                        ↑
+       |           |---------------------------|            |
+       ↓             |                       |              |
+     cmd1⚙️    -->    end[1]      ↔        end[0]   -->    ⚙️cmd2           
+                     |                       |
+            cmd1   |---------------------------|  end[0]
+           output                            recibe de end[1]
+         escribe en                         y envia la salida de
+          el end[1]                      cmd1 al cmd2 como entrada
+```
+
+la función pipe recibe un array con dos numeros que representan la salida y la entrada de la tuberia y las une. De esta forma, lo que representan los numeros del array no es lo que se ha guardado si no fds, de tal manera que array[1] escribe en su propio fd algo que puede ser leido por array[2] y viceversa.
+
+### FUNCIONAMIENTO DE FORK():
+
+Cuando se llama a la función **`fork()`**, el sistema operativo crea un nuevo proceso que es una duplicación del proceso padre. Este nuevo proceso se denomina proceso hijo. El proceso hijo recibe su propio identificador de proceso único (PID), distinto del proceso padre.
+
+Los valores que devuelve fork son:
+
+- < 0 si la función ha fallado
+
+- 0 si estamos en el proceso hijo
+- > 0 si estamos en el proceso padre
+
+Al hacer un fork y crear un nuevo proceso, el orden de ejecución del padre y el hijo es cosa nuestra.
+
+Si por ejemplo queremos que se **ejecuten de forma concurrente**, podriamos hacer algo como esto: 
+
+```c
+pid_t pid = fork();
+
+	if (pid < 0) {
+		// Error occurred
+		ft_printf("Fork failed.\n");
+		return 1;
+	} else if (pid == 0) {
+		// Child process
+		while (1) {
+			ft_printf("A\n");
+			sleep(1);
+		}
+	} else {
+		// Parent process
+		while (1) {
+			ft_printf("B\n");
+			sleep(2);
+		}
+	}
+```
+
+Esto hará que cada dos segundos el padre escriba una B y que cada segundo el hijo escriba una A.
+
+Los dos procesos se estarian ejecutando a la vez, cada uno con su propio PID.
+
+```csharp
+➜  pipex git:(main) ✗ ./pipex
+B
+A
+A
+A
+B
+A
+A
+B
+A
+A
+```
+
+Devolvería algo así por la terminal
+
+Si por ejemplo lo que queremos hacer es que **el hijo se ejecute primero**, podemos conseguirlo diciendo al padre que espere:
+
+```c
+int	main(void)
+{
+	pid_t	ppid;
+
+	ppid = fork();
+	if (ppid == -1)
+	{
+		ft_printf("Error en fork");
+		exit(EXIT_FAILURE);
+	}
+	if (ppid == 0)
+		ft_printf("Child process\n");
+	else
+	{
+		wait(0);
+		ft_printf("Parent process\n");
+	}
+	return (0);
+}
+```
+
+Aqui hacemos que el padre termine hasta que el hijo termine de hacer su proceso y despues se ejecutará el del padre. 
+
+Cuando estamos usando `fork()`, está estandarizado que la función `wait(0)` se encarga de esperar a que un proceso hijo termine. En caso de tener varios hijos, se puede especificar cual mediante funciones como `waitpid()`
+
+```csharp
+➜  pipex git:(main) ✗ ./pipex
+Child process
+Parent process
+```
+
+Esto es lo que mostraria en terminal el programa anterior.
+
+Por ultimo, puede que queramos que el **padre se ejecute primero** y a continuación los hijos. Hay varias formas de conseguir esto:
+
+```c
+int	main(void)
+{
+	pid_t	ppid;
+
+	ppid = fork();
+	if (ppid == -1)
+	{
+		ft_printf("Error en fork");
+		exit(EXIT_FAILURE);
+	}
+	if (ppid > 0)
+		ft_printf("Parent process\n");
+	else
+	{
+		wait(0);
+		ft_printf("Child process\n");
+	}
+	return (0);
+}
+```
+
+```bash
+int	main(void)
+{
+	pid_t	ppid;
+
+	ppid = fork();
+	if (ppid == -1)
+	{
+		ft_printf("Error en fork");
+		exit(EXIT_FAILURE);
+	}
+	if (ppid == 0)
+		ft_printf("Child process\n");
+	else
+	ft_printf("Parent process\n");
+	return (0);
+}
+```
+
+Ambos codigos anteriores mostrarían en la terminal lo siguiente:
+
+```csharp
+➜  pipex git:(main) ✗ ./pipex
+Parent process
+Child process
+```
+
+### FUNCIONAMIENTO DE DUP2():
+
+Esta función recibe por argumentos dos números (fd) de forma que el primero es el nuevo fd y el segundo el antiguo fd. Un programa facil para entender como funciona dup2 podria ser:
+
+```c
+int	main(void)
+{
+	int	fd_file;
+
+	fd_file = open("testfile.txt", O_WRONLY);
+	dup2(fd_file, 1);
+	ft_printf("Esto no se escribe en la terminal\n");
+	return (0);
+}
+```
+
+Este programa, pese a que `ft_printf()` muestre las cosas por defecto en la salida 1 (terminal o STDOUT) no mostraría nada en la pantalla, si no que mostraría eso en una archivo `testfile.txt`.
+
+## FUNCIONAMIENTO DEL PROGRAMA PIPEX
+
+A la hora de realizar el proyecto, tenemos que tener muy en cuenta tanto las funciones previas como algunas otras, la teoría del programa es:
+
+- **Creamos** un **pipe y** hacemos **fork()**.
+- El programa hijo **cambiará sus fd de entrada y salida** por el primer archivo y la zona de escritura de la pipe, respectivamente.
+- Despues de esto y configurar los cierres de la pipe, tendrá que **ejecutar cmd1** sobre infile y escribir el resultado de ello en la pipe, para que despues sea leido por el proceso padre.
+- El proceso padre **cambiará la salida y entrad**a por el outfile y la zona de lectura de la pipe, respectivamente.
+- A continuación, **aplicará cmd2** sobre lo que lee en la pipe y escribirá el resultado en el outfile.
+
+Sin embargo, ejecutar el comando que recibimos no es tan facil. Para ello debemos utlizar el argumento **ENVP.**
+
+El array envp es un argumento que podemos indicar que sea recibido por defecto en el programa, el cual incluye las variables de entorno del ordenador.
+
+<aside>
+💡 Las variables de entorno son un conjunto de información sobre la configuración del sistema. Podemos ver esto con el comando **env** en la terminal. Entre la información que incluye podemos encontrar todos los paths donde el sistema almacena las funciones de la consola.
+
+</aside>
+
+La parte del path es la que queremos usar en nuestro programa para saber dónde esta el cmd que nos han pedido ejecutar, **los comandos pueden estar en varias ubicaciones diferentes**, por lo que tendremos que ir probando (con la funcion `access`) hasta dar con la localización del comando que queremos usar. Una vez encontrado, lo ejecutaremos mediante el uso de la función `execve`. Esta función recibirá: El **path del comando** a ejecutar, un array con todo lo que se ejecutará **(el comando + las flags)** y el array **envp**.
