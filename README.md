@@ -8,6 +8,7 @@
 	<img src="https://img.shields.io/badge/bonus-not%20done-red?style=flat"/>
 	<img src="https://img.shields.io/badge/-unknown%2F100-inactive?style=flat&logo=42&logoColor=000" />
 </div>
+(este proyecto no será evaluado, pero es necesario para Minishell, un proyecto posterior)
 
 <h2 align="center">📜 PROYECT DESCRIPTION 📜</h2>
 
