@@ -7,8 +7,9 @@
 	<img src="https://img.shields.io/badge/leaks-KO-red?style=flat"/>
 	<img src="https://img.shields.io/badge/bonus-not%20done-red?style=flat"/>
 	<img src="https://img.shields.io/badge/-unknown%2F100-inactive?style=flat&logo=42&logoColor=000" />
+	<br />
+	<p>(este proyecto no será evaluado, pero es necesario para Minishell, un proyecto posterior)</p>
 </div>
-<p>(este proyecto no será evaluado, pero es necesario para Minishell, un proyecto posterior)</p>
 
 <h2 align="center">📜 PROYECT DESCRIPTION 📜</h2>
 
