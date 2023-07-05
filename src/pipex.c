@@ -6,7 +6,7 @@
 /*   By: ealgar-c <ealgar-c@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 15:34:06 by ealgar-c          #+#    #+#             */
-/*   Updated: 2023/06/27 15:57:08 by ealgar-c         ###   ########.fr       */
+/*   Updated: 2023/07/05 13:15:23 by ealgar-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ char	*get_useful_path(char *cmd, char **envp)
 	return (NULL);
 }
 
-void	execute_process(char *cmd, char **envp)
+void	execute_process(char *cmd, char **envp, int out_fd)
 {
 	char	*path;
 	char	**cmd_splitted;
@@ -49,6 +49,7 @@ void	execute_process(char *cmd, char **envp)
 	path = get_useful_path(cmd_splitted[0], envp);
 	if (path == NULL)
 	{
+		dup2(STDOUT_FILENO, out_fd);
 		ft_printf("Error: Command %s not found\n", cmd_splitted[0]);
 		while (cmd_splitted[i])
 			free(cmd_splitted[i++]);
@@ -71,7 +72,7 @@ void	child_process(char **argv, int *pipe_fd, char **envp)
 	dup2(infile_fd, STDIN_FILENO);
 	dup2(pipe_fd[1], STDOUT_FILENO);
 	close(pipe_fd[0]);
-	execute_process(argv[2], envp);
+	execute_process(argv[2], envp, pipe_fd[1]);
 }
 
 void	parent_process(char **argv, int *pipe_fd, char **envp)
@@ -82,7 +83,7 @@ void	parent_process(char **argv, int *pipe_fd, char **envp)
 	dup2(outfile_fd, STDOUT_FILENO);
 	dup2(pipe_fd[0], STDIN_FILENO);
 	close(pipe_fd[1]);
-	execute_process(argv[3], envp);
+	execute_process(argv[3], envp, outfile_fd);
 }
 
 int	main(int argc, char **argv, char **envp)
