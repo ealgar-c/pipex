@@ -23,11 +23,14 @@ Este proyecto busca profundizar un poco en dos conceptos que ya conoces: Las red
 ├── README.md
 ├── libft/
 ├── include/
-│   └── pipex.h
+│   ├── pipex.h
+│   └── pipex_bonus.h
 ├── infile
-├── objs/
 ├── outfile
 └── src/
+    ├── bonus/
+    │   ├── pipex_bonus.c
+    │   └── utils_bonus.c
     └── pipex.c
 
 ```
