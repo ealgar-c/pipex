@@ -267,3 +267,19 @@ El array envp es un argumento que podemos indicar que sea recibido por defecto e
 </aside>
 
 La parte del path es la que queremos usar en nuestro programa para saber dónde esta el cmd que nos han pedido ejecutar, **los comandos pueden estar en varias ubicaciones diferentes**, por lo que tendremos que ir probando (con la funcion `access`) hasta dar con la localización del comando que queremos usar. Una vez encontrado, lo ejecutaremos mediante el uso de la función `execve`. Esta función recibirá: El **path del comando** a ejecutar, un array con todo lo que se ejecutará **(el comando + las flags)** y el array **envp**.
+
+## EXPLICACIÓN BONUS
+
+Este proyecto tiene dos bonus que nos serviran para profundizar aun más en el funcionamiento de las pipes de nuestra terminal.
+
+1️⃣ Gestión de múltiples pipes
+
+2️⃣ Parametro here_doc para leer desde dentro de la terminal
+
+### Uso de múltiples pipes:
+
+Para poder usar multiples pipes, tenemos que ir creando varios procesos hijos y ir creando para cada uno una pipe, de forma que se vayan enviando de uno a otro el output del comando hasta llegar al ultimo, que lo escribe en outfile.
+
+### Uso del here_doc:
+
+En caso de que el primer archivo sea here_doc, no tendrá que abrir ningun archivo, si no que leerá de pantalla hasta que lea un limitador que se pasará también como argumento. Después de eso se ejecutaría el primer bonus.

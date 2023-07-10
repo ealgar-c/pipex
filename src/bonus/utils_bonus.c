@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   utils_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ealgar-c <ealgar-c@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/26 15:34:06 by ealgar-c          #+#    #+#             */
-/*   Updated: 2023/07/10 15:08:12 by ealgar-c         ###   ########.fr       */
+/*   Created: 2023/07/10 14:35:47 by ealgar-c          #+#    #+#             */
+/*   Updated: 2023/07/10 15:08:01 by ealgar-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/pipex.h"
+#include "../../include/pipex_bonus.h"
 
 static char	*get_useful_path(char *cmd, char **envp)
 {
@@ -57,57 +57,29 @@ void	execute_process(char *cmd, char **envp)
 	execve(path, cmd_splitted, envp);
 }
 
-static void	child_process(char **argv, int *pipe_fd, char **envp)
+void	error(int errnb)
 {
-	int		infile_fd;
-
-	infile_fd = open(argv[1], O_RDONLY, 0777);
-	if (infile_fd == -1)
+	if (errnb == 0)
 	{
-		ft_printf("Error en el fichero de entrada\n");
-		exit(EXIT_FAILURE);
+		ft_printf("Numero de argumentos incorrecto\n");
+		ft_printf("Llama a la función de la forma:");
+		ft_printf(" ./pipex_bonus file 1 cmd1 cmd2 ... cmdn file2\n");
 	}
-	dup2(infile_fd, STDIN_FILENO);
-	dup2(pipe_fd[1], STDOUT_FILENO);
-	close(pipe_fd[0]);
-	execute_process(argv[2], envp);
+	else if (errnb == 1)
+		ft_printf("Error de apertura de archivos\n");
+	else if (errnb == 2)
+		ft_printf("Error en un pipe\n");
+	else if (errnb == 3)
+		ft_printf("Error en un fork\n");
+	exit(EXIT_FAILURE);
 }
 
-static void	parent_process(char **argv, int *pipe_fd, char **envp)
+int	ft_strcmp(const char *s1, const char *s2)
 {
-	int		outfile_fd;
-
-	outfile_fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	dup2(outfile_fd, STDOUT_FILENO);
-	dup2(pipe_fd[0], STDIN_FILENO);
-	close(pipe_fd[1]);
-	execute_process(argv[3], envp);
-}
-
-int	main(int argc, char **argv, char **envp)
-{
-	pid_t	ppid;
-	int		pipe_fd[2];
-
-	if (argc != 5)
+	while (*s1 && *s2 && *s1 == *s2)
 	{
-		ft_printf("Numero de argumentos incorrecto");
-		exit(EXIT_FAILURE);
+		s1++;
+		s2++;
 	}
-	if (pipe(pipe_fd) == -1)
-	{
-		ft_printf("Error en pipe");
-		exit(EXIT_FAILURE);
-	}
-	ppid = fork();
-	if (ppid == -1)
-	{
-		ft_printf("Error en fork");
-		exit(EXIT_FAILURE);
-	}
-	if (ppid == 0)
-		child_process(argv, pipe_fd, envp);
-	wait(0);
-	parent_process(argv, pipe_fd, envp);
-	return (0);
+	return (*(unsigned char *)s1 - *(unsigned char *)s2);
 }
